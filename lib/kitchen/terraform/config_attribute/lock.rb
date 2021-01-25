@@ -21,12 +21,7 @@ require "kitchen/terraform/config_schemas/boolean"
 module Kitchen
   module Terraform
     class ConfigAttribute
-      # This attribute toggles {https://www.terraform.io/docs/state/locking.html locking of the Terraform state file}.
-      #
-      # Type:: {http://www.yaml.org/spec/1.2/spec.html#id2803629 Boolean}
-      # Required:: False
-      # Default:: +true+
-      # Example:: <code>lock: false</code>
+      # Lock adds the lock configuration attribute.
       module Lock
         ::Kitchen::Terraform::ConfigAttribute.new(
           attribute: :lock,

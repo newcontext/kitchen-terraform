@@ -6,7 +6,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="msapplication-config" content="browserconfig.xml" />
-    <title>About Kitchen-Terraform</title>
+    <title>Provisioner</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/kitchen-terraform/apple-touch-icon-180x180-precomposed.png">
     <link rel="apple-touch-icon" sizes="152x152" href="/kitchen-terraform/apple-touch-icon-152x152-precomposed.png">
     <link rel="apple-touch-icon" sizes="144x144" href="/kitchen-terraform/apple-touch-icon-144x144-precomposed.png">
@@ -45,7 +45,7 @@
             <a href="/kitchen-terraform/tutorials/" class="nav-link">Tutorials</a>
           </li>
           <li class="nav-item">
-            <a href="/kitchen-terraform/about.html" class="nav-link">About</a>
+            <a href="/kitchen-terraform/documentation/" class="nav-link">Documentation</a>
           </li>
           <li class="nav-item">
             <a href="/kitchen-terraform/community/" class="nav-link">Community</a>
@@ -59,30 +59,100 @@
       </div>
     </nav>
     <div class="content text-left">
-      <div class="container" style="padding-top: 0px;">
-  <div class="row">
-    <div class="col-12">
-      <div class="jumbotron">
-        <h1 class="display-3">
-          About Kitchen-Terraform
-        </h1>
-        <p class="lead">
-          <a href="https://github.com/newcontext-oss/kitchen-terraform" style="color: #32c850;">Kitchen Terraform</a> brings the benefits of test-driven development to <a href="http://terraform.io" style="color: #32c850;">Terraform</a> projects.
-        </p>
-        <p class="lead">
-          As use of Terraform continues to gain popularity in production environments, it is critical that this logic is thoroughly tested. Development cycle can now be driven by a suite of tests to verify new features and protect against regressions.
-        </p>
-        <hr>
-        <p class="lead">
-          Using Kitchen Terraform enables a test matrix that can vary in platforms, input variables and even fixture modules.
-        </p>
-        <p class="lead">
-          Kitchen Terraform provides a consistent approach for testing Terraform projects locally and in continuous integration pipelines.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
+      <h1 id="kitchen-terraform-provisioner">Kitchen-Terraform Provisioner</h1>
+
+<p>The provisioner applies changes to the Terraform state based on the
+configuration of the root module.</p>
+
+<h2 id="commands">Commands</h2>
+
+<p>The following command-line actions are provided by the provisioner:</p>
+
+<ul>
+  <li>converge</li>
+</ul>
+
+<h3 id="converge">converge</h3>
+
+<p>A Kitchen instance is converged through the following steps:</p>
+
+<ul>
+  <li>selecting the test Terraform workspace</li>
+  <li>updating the Terraform dependency modules</li>
+  <li>validating the Terraform root module</li>
+  <li>applying the Terraform state changes</li>
+  <li>retrieving the Terraform output</li>
+</ul>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>$ kitchen help converge
+$ kitchen converge default-ubuntu
+</code></pre></div>
+<h4 id="selecting-the-test-terraform-workspace">Selecting the Test Terraform Workspace</h4>
+
+<p>The provisioner selects the workspace by running a command like the 
+following example:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform workspace select &lt;name&gt;
+</code></pre></div>
+<h4 id="updating-the-terraform-dependency-modules">Updating the Terraform Dependency Modules</h4>
+
+<p>The provisioner updates the dependency modules by running a command 
+like the following example:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform get -update &lt;directory&gt;
+</code></pre></div>
+<h4 id="validating-the-terraform-root-module">Validating the Terraform Root Module</h4>
+
+<p>The provisioner validates the root module by running a command like the 
+following example, where the options are controlled by configuration 
+attributes of the <a href="/kitchen-terraform/documentation/driver.html">driver</a>:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform validate \
+  [-no-color] \
+  [-var=&lt;variables.first&gt;...] \
+  [-var-file=&lt;variable_files.first&gt;...] \
+  &lt;directory&gt;
+</code></pre></div>
+<h4 id="applying-the-terraform-state-changes">Applying the Terraform State Changes</h4>
+
+<p>The provisioner applies the state changes by running a command like the 
+following example, where the options are controlled by configuration 
+attributes of the <a href="/kitchen-terraform/documentation/driver.html">driver</a>:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform apply \
+  -auto-approve=true \
+  -input=false \
+  -refresh=true \
+  -lock-timeout=&lt;lock_timeout&gt;s \
+  -lock=&lt;lock&gt; \
+  -parallelism=&lt;parallelism&gt; \
+  [-no-color] \
+  [-var-file=&lt;variable_files.first&gt;...] \
+  [-var=&lt;variables.first&gt;...] \
+  &lt;directory&gt;
+</code></pre></div>
+<h4 id="retrieving-the-terraform-output">Retrieving the Terraform Output</h4>
+
+<p>The provisioner retrieves the outputs by running a command like the 
+following example:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform output -json
+</code></pre></div>
+<h2 id="configuration">Configuration</h2>
+
+<p>Within the
+<a href="http://kitchen.ci/docs/getting-started/kitchen-yml">Kitchen configuration file</a>, 
+the <code>provisioner</code> mapping must be declared along with the plugin name:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">provisioner</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+</code></pre></div>
+<h3 id="attributes">Attributes</h3>
+
+<p>The provisioner has no configuration attributes, but rather relies on 
+the attributes of the <a href="/kitchen-terraform/documentation/driver.html">driver</a>.</p>
 
     </div>
     <footer class="footer">

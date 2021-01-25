@@ -26,32 +26,8 @@ module Kitchen
   module Provisioner
     # The provisioner applies changes to the Terraform state based on the configuration of the root module.
     #
-    # === Commands
-    #
-    # The following command-line actions are provided by the provisioner.
-    #
-    # ==== kitchen converge
-    #
-    # {include:Kitchen::Terraform::Provisioner::Converge}
-    #
-    # === Configuration Attributes
-    #
-    # The provisioner has no configuration attributes, but the +provisioner+ mapping must be declared with the plugin name
-    # within the {http://kitchen.ci/docs/getting-started/kitchen-yml Test Kitchen configuration file}.
-    #
-    #   provisioner:
-    #     name: terraform
-    #
-    # === Ruby Interface
-    #
     # This class implements the interface of Kitchen::Configurable which requires the following Reek suppressions:
     # :reek:MissingSafeMethod { exclude: [ finalize_config! ] }
-    #
-    # @example Describe the converge command
-    #   kitchen help converge
-    # @example Converge a Test Kitchen instance
-    #   kitchen converge default-ubuntu
-    # @version 2
     class Terraform < ::Kitchen::Provisioner::Base
       # UNSUPPORTED_BASE_ATTRIBUTES is the list of attributes inherited from
       # Kitchen::Provisioner::Base which are not supported by Kitchen::Provisioner::Terraform.

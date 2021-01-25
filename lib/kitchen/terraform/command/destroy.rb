@@ -23,18 +23,7 @@ require "shellwords"
 module Kitchen
   module Terraform
     module Command
-      # The state is destroyed by running a command like the following example:
-      #   terraform destroy \
-      #     -auto-approve \
-      #     -lock=<lock> \
-      #     -lock-timeout=<lock_timeout>s \
-      #     -input=false \
-      #     [-no-color] \
-      #     -parallelism=<parallelism> \
-      #     -refresh=true \
-      #     [-var=<variables.first>...] \
-      #     [-var-file=<variable_files.first>...] \
-      #     <root_module_directory>
+      # Destroy reprpesents the <code>terraform destroy</code> command.
       class Destroy
         # #initialize prepares a new instance of the class.
         #

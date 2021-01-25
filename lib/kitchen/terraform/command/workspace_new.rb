@@ -17,8 +17,7 @@
 module Kitchen
   module Terraform
     module Command
-      # The workspace is created by running a command like the following example:
-      #   terraform workspace new <name>
+      # WorkspaceNew represents the <code>terraform workspace new</code> command.
       class WorkspaceNew
         # #initialize prepares a new instance of the class.
         #

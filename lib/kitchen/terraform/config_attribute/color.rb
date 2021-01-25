@@ -21,16 +21,7 @@ require "kitchen/terraform/config_schemas/boolean"
 module Kitchen
   module Terraform
     class ConfigAttribute
-      # This attribute toggles colored output from systems invoked by the plugin.
-      #
-      # Type:: {http://www.yaml.org/spec/1.2/spec.html#id2803629 Boolean}
-      # Required:: False
-      # Default:: If a {https://en.wikipedia.org/wiki/Terminal_emulator terminal emulator} is associated with the Test
-      #           Kitchen process then +true+; else +false+.
-      # Example:: <code>color: false</code>
-      # Caveat:: This attribute does not toggle colored output from the Test Kitchen core, though it does use the same
-      #          default logic. To toggle colored output from the core, the +--color+ and +--no-color+ command-line
-      #          flags must be used.
+      # Color adds the color configuration attribute.
       module Color
         ::Kitchen::Terraform::ConfigAttribute.new(
           attribute: :color,

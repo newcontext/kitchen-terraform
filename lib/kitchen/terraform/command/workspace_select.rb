@@ -17,8 +17,7 @@
 module Kitchen
   module Terraform
     module Command
-      # The workspace is selected by running a command like the following example:
-      #   terraform workspace select <name>
+      # WorkspaceSelect represents the <code>terraform workspace select</code> command.
       class WorkspaceSelect
         # #initialize prepares a new instance of the class.
         #

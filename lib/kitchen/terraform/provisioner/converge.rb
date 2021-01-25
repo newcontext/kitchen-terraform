@@ -32,27 +32,7 @@ require "kitchen/terraform/version"
 module Kitchen
   module Terraform
     module Provisioner
-      # A Test Kitchen instance is converged through the following steps.
-      #
-      # ===== Selecting the Test Terraform Workspace
-      #
-      # {include:Kitchen::Terraform::Command::WorkspaceSelect}
-      #
-      # ===== Updating the Terraform Dependency Modules
-      #
-      # {include:Kitchen::Terraform::Command::Get}
-      #
-      # ===== Validating the Terraform Root Module
-      #
-      # {include:Kitchen::Terraform::Command::Validate}
-      #
-      # ===== Applying the Terraform State Changes
-      #
-      # {include:Kitchen::Terraform::Command::Apply}
-      #
-      # ===== Retrieving the Terraform Output
-      #
-      # {include:Kitchen::Terraform::Command::Output}
+      # Converge is the class of objects which implement the converge command.
       class Converge
         # #call executes the action.
         #

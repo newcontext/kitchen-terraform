@@ -17,8 +17,7 @@
 module Kitchen
   module Terraform
     module Command
-      # The outputs are retrieved by running a command like the following example:
-      #   terraform output -json
+      # Output is the class of objects which represent the +output+ command.
       class Output
         # @return [String] the command with flags.
         def to_s

@@ -17,8 +17,7 @@
 module Kitchen
   module Terraform
     module Command
-      # The workspace is deleted by running a command like the following example:
-      #   terraform workspace delete <name>
+      # WorkspaceDelete represents the <code>terraform workspace delete</code> command.
       class WorkspaceDelete
         # @param config [Hash] the configuration of the driver.
         # @option config [String] :workspace_name the name of the Terraform workspace.

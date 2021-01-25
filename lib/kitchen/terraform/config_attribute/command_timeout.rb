@@ -20,13 +20,7 @@ require "kitchen/terraform/config_attribute_type/integer"
 module Kitchen
   module Terraform
     class ConfigAttribute
-      # This attribute controls the number of seconds that the plugin will wait for Terraform commands to finish
-      # running.
-      #
-      # Type:: {http://www.yaml.org/spec/1.2/spec.html#id2803828 Integer}
-      # Required:: False
-      # Default:: +600+
-      # Example:: <code>command_timeout: 1200</code>
+      # CommandTimeout adds the command_timeout configuration attribute.
       module CommandTimeout
         ::Kitchen::Terraform::ConfigAttributeType::Integer.apply(
           attribute: :command_timeout,

@@ -22,12 +22,7 @@ require "shellwords"
 module Kitchen
   module Terraform
     module Command
-      # The root module is validated by running a command like the following example:
-      #   terraform validate \
-      #     [-no-color] \
-      #     [-var=<variables.first>...] \
-      #     [-var-file=<variable_files.first>...] \
-      #     <directory>
+      # Validate is the class of objects which represent the +validate+ command.
       class Validate
         # #initialize prepares a new instance of the class.
         #

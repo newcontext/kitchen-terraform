@@ -23,21 +23,7 @@ require "kitchen/terraform/command_flag/upgrade"
 module Kitchen
   module Terraform
     module Command
-      # The working directory is initialized by running a command like the following example:
-      #   terraform init \
-      #     -input=false \
-      #     -lock=<lock> \
-      #     -lock-timeout=<lock_timeout>s \
-      #     [-no-color] \
-      #     [-upgrade] \
-      #     -force-copy \
-      #     -backend=true \
-      #     [-backend-config=<backend_configurations[0]> ...] \
-      #     -get=true \
-      #     -get-plugins=true \
-      #     [-plugin-dir=<plugin_directory>] \
-      #     -verify-plugins=true \
-      #     <root_module_directory>
+      # Init represents the <code>terraform init</code> command.
       class Init
         # #initialize prepares a new instance of the class.
         #

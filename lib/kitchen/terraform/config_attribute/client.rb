@@ -22,21 +22,7 @@ require "tty/which"
 module Kitchen
   module Terraform
     class ConfigAttribute
-      # This attribute contains the pathname of the
-      # {https://www.terraform.io/docs/commands/index.html Terraform client} to be used by Kitchen-Terraform.
-      #
-      # If the value is not an absolute pathname or a relative pathname then Kitchen-Terraform will attempt to find the
-      # value in the directories of the {https://en.wikipedia.org/wiki/PATH_(variable) PATH}.
-      #
-      # The pathname of any executable file which implements the interfaces of the following Terraform client commands
-      # may be specified: apply; destroy; get; init; validate; workspace.
-      #
-      # Type:: {http://www.yaml.org/spec/1.2/spec.html#id2760844 Scalar}
-      # Required:: False
-      # Default:: <code>terraform</code>
-      # Example:: <code>client: /usr/local/bin/terraform</code>
-      # Example:: <code>client: ./bin/terraform</code>
-      # Example:: <code>client: terraform</code>
+      # Client adds the client configuration attribute.
       module Client
         class << self
           # .included is a callback to define the configuration attribute which is invoked when this module is included

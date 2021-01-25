@@ -20,13 +20,7 @@ require "kitchen/terraform/config_attribute_type/integer"
 module Kitchen
   module Terraform
     class ConfigAttribute
-      # This attribute controls the number of concurrent operations to use while Terraform
-      # {https://www.terraform.io/docs/internals/graph.html#walking-the-graph walks the resource graph}.
-      #
-      # Type:: {http://www.yaml.org/spec/1.2/spec.html#id2803828 Integer}
-      # Required:: False
-      # Default:: +10+
-      # Example:: <code>parallelism: 50</code>
+      # Parallelism adds the parallelism configuration attribute.
       module Parallelism
         ::Kitchen::Terraform::ConfigAttributeType::Integer.apply(
           attribute: :parallelism,

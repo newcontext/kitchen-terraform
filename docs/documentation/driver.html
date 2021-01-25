@@ -1,0 +1,465 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="msapplication-config" content="browserconfig.xml" />
+    <title>Driver</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/kitchen-terraform/apple-touch-icon-180x180-precomposed.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/kitchen-terraform/apple-touch-icon-152x152-precomposed.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/kitchen-terraform/apple-touch-icon-144x144-precomposed.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/kitchen-terraform/apple-touch-icon-114x114-precomposed.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/kitchen-terraform/apple-touch-icon-72x72-precomposed.png">
+    <link rel="apple-touch-icon" href="/kitchen-terraform/apple-touch-icon-precomposed.png">
+    <link rel="icon" type="image/png" sizes="196x196" href="/kitchen-terraform/favicon-196x196.png">
+    <link rel="icon" type="image/png" sizes="160x160" href="/kitchen-terraform/favicon-160x160.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/kitchen-terraform/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/kitchen-terraform/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/kitchen-terraform/favicon-16x16.png">
+    <link rel="shortcut icon" href="/kitchen-terraform/favicon.png">
+    <link rel="icon" type="image/ico" href="/kitchen-terraform/favicon.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link href="/kitchen-terraform/stylesheets/highlighting.css" rel="stylesheet" />
+    <link href="/kitchen-terraform/stylesheets/material.css" rel="stylesheet" />
+    <link href="/kitchen-terraform/stylesheets/site.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script src="/kitchen-terraform/javascripts/site.js"></script>
+  </head>
+  <body>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light header">
+      <img src="/kitchen-terraform/images/kitchen_terraform_logo.png" class="d-inline-block" style="vertical-align: sub; margin-left: 10px;" width="18" height="18" alt="Kitchen-Terraform logo" />
+      <a href="/kitchen-terraform/" class="navbar-brand" style="padding-left: 5px;">Kitchen-Terraform</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a href="/kitchen-terraform/getting_started.html" class="nav-link">Getting Started</a>
+          </li>
+          <li class="nav-item">
+            <a href="/kitchen-terraform/tutorials/" class="nav-link">Tutorials</a>
+          </li>
+          <li class="nav-item">
+            <a href="/kitchen-terraform/documentation/" class="nav-link">Documentation</a>
+          </li>
+          <li class="nav-item">
+            <a href="/kitchen-terraform/community/" class="nav-link">Community</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/newcontext-oss/kitchen-terraform">
+              <img src="/kitchen-terraform/images/github.png" class="d-inline-block" style="vertical-align: sub;" width="18" height="18" alt="GitHub logo" /> Contribute
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="content text-left">
+      <h1 id="kitchen-terraform-driver">Kitchen-Terraform Driver</h1>
+
+<p>The driver is the bridge between Kitchen and Terraform. It manages the
+<a href="https://www.terraform.io/docs/state/index.html">state</a> of the Terraform
+root module by shelling out and running Terraform commands.</p>
+
+<h2 id="commands">Commands</h2>
+
+<p>The following command-line commands are provided by the driver:</p>
+
+<ul>
+  <li>create</li>
+  <li>destroy</li>
+</ul>
+
+<h3 id="create">create</h3>
+
+<p>A Kitchen instance is created through the following steps:</p>
+
+<ul>
+  <li>initializing the Terraform working directory</li>
+  <li>creating or selecting the test Terraform workspace</li>
+</ul>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>$ kitchen help create
+$ kitchen create default-ubuntu
+</code></pre></div>
+<h4 id="initializing-the-terraform-working-directory">Initializing the Terraform Working Directory</h4>
+
+<p>The driver initializes the working directory by running a command like 
+the following example, where the options are controlled by 
+configuration attributes:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform init \
+  -backend=true \
+  -force-copy \
+  -get-plugins=true \
+  -get=true \
+  -input=false \
+  -verify-plugins=true \
+  -lock=&lt;lock&gt; \
+  -lock-timeout=&lt;lock_timeout&gt;s \
+  [-no-color] \
+  [-upgrade] \
+  [-backend-config=&lt;backend_configurations[0]&gt; ...] \
+  [-plugin-dir=&lt;plugin_directory&gt;] \
+  &lt;root_module_directory&gt;
+</code></pre></div>
+<h4 id="creating-or-selecting-the-test-terraform-workspace">Creating or Selecting the Test Terraform Workspace</h4>
+
+<p>The driver creates or selects the workspace by running a command like the 
+following example:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform workspace new &lt;name&gt; || terraform workspace select &lt;name&gt;
+</code></pre></div>
+<h3 id="destroy">destroy</h3>
+
+<p>A Kitchen instance is destroyed through the following steps:</p>
+
+<ul>
+  <li>initializing the Terraform working directory</li>
+  <li>selecting or creating the test Terraform workspace</li>
+  <li>destroying the Terraform state</li>
+  <li>selecting the default Terraform workspace</li>
+  <li>deleting the test Terraform workspace</li>
+</ul>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>$ kitchen help destroy
+$ kitchen destroy default-ubuntu
+</code></pre></div>
+<h4 id="initializing-the-terraform-working-directory-1">Initializing the Terraform Working Directory</h4>
+
+<p>The driver initializes the working directory by running a command like 
+the following example, where the options are controlled by 
+configuration attributes:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform init \
+  -backend=true \
+  -force-copy \
+  -get-plugins=true \
+  -get=true \
+  -input=false \
+  -verify-plugins=true \
+  -lock-timeout=&lt;lock_timeout&gt;s \
+  -lock=&lt;lock&gt; \
+  [-backend-config=&lt;backend_configurations[0]&gt; ...] \
+  [-no-color] \
+  [-plugin-dir=&lt;plugin_directory&gt;] \
+  [-upgrade] \
+  &lt;root_module_directory&gt;
+</code></pre></div>
+<h4 id="selecting-or-creating-the-test-terraform-workspace">Selecting or Creating the Test Terraform Workspace</h4>
+
+<p>The driver selects or creates the workspace by running a command like the 
+following example:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform workspace select &lt;name&gt; || terraform workspace new &lt;name&gt;
+</code></pre></div>
+<h4 id="destroying-the-terraform-state">Destroying the Terraform State</h4>
+
+<p>The driver destroys the state by running a command like the following
+example, where the options are controlled by configuration
+attributes:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform destroy \
+  -auto-approve \
+  -input=false \
+  -refresh=true \
+  -lock-timeout=&lt;lock_timeout&gt;s \
+  -lock=&lt;lock&gt; \
+  -parallelism=&lt;parallelism&gt; \
+  [-no-color] \
+  [-var-file=&lt;variable_files.first&gt;...] \
+  [-var=&lt;variables.first&gt;...] \
+  &lt;root_module_directory&gt;
+</code></pre></div>
+<h4 id="selecting-the-default-terraform-workspace">Selecting the Default Terraform Workspace</h4>
+
+<p>The driver selects the workspace by running a command like the 
+following example:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform workspace select default
+</code></pre></div>
+<h4 id="deleting-the-test-terraform-workspace">Deleting the Test Terraform Workspace</h4>
+
+<p>The driver deletes the workspace by running a command like the following
+example:</p>
+
+<div class="highlight"><pre class="syntax-highlight plaintext"><code>terraform workspace delete &lt;name&gt;
+</code></pre></div>
+<h2 id="configuration">Configuration</h2>
+
+<p>Within the
+<a href="http://kitchen.ci/docs/getting-started/kitchen-yml">Kitchen configuration file</a>, 
+the <code>driver</code> mapping must be declared along with the plugin name:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+</code></pre></div>
+<h3 id="attributes">Attributes</h3>
+
+<p>The configuration attributes of the driver control the behaviour of the 
+Terraform commands that are run.</p>
+
+<h3 id="backendconfigurations">backend_configurations</h3>
+
+<p>This attribute comprises
+<a href="https://www.terraform.io/docs/backends/config.html">Terraform backend configuration</a>
+arguments to complete a
+<a href="https://www.terraform.io/docs/backends/config.html#partial-configuration">partial backend configuration</a>.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2760142">Mapping of scalars to scalars</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: <code>{}</code></p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">backend_configurations</span><span class="pi">:</span>
+    <span class="na">address</span><span class="pi">:</span> <span class="s">demo.consul.io</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">example_app/terraform_state</span>
+</code></pre></div>
+<h3 id="client">client</h3>
+
+<p>This attribute contains the pathname of the
+<a href="https://www.terraform.io/docs/commands/index.html">Terraform client</a> to
+be used by Kitchen-Terraform.</p>
+
+<p>The pathname of any executable file which implements the interfaces of
+the following Terraform client commands may be specified:</p>
+
+<ul>
+  <li>apply</li>
+  <li>destroy</li>
+  <li>get</li>
+  <li>init</li>
+  <li>validate</li>
+  <li>workspace</li>
+</ul>
+
+<p><a href="https://terragrunt.gruntwork.io/">Terragrunt</a> is an example of a
+compatible Terraform client that could be used.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2760844">Scalar</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: <code>terraform</code></p>
+
+<p><em>Caveat</em>: If the value is not an absolute pathname or a relative
+pathname then the driver will attempt to find the value in the
+directories of the
+<a href="https://en.wikipedia.org/wiki/PATH_(variable)">PATH</a>.</p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">client</span><span class="pi">:</span> <span class="s">/usr/local/bin/terraform</span>
+</code></pre></div>
+<h3 id="color">color</h3>
+
+<p>This attribute toggles colored output from shell-out commands invoked by
+the driver.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2803629">Boolean</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: If a
+<a href="https://en.wikipedia.org/wiki/Terminal_emulator">terminal emulator</a> is
+associated with the Kitchen process then <code>true</code>; else <code>false</code>.</p>
+
+<p><em>Caveat</em>: This attribute does not toggle colored output from Kitchen
+itself; that requires the use of the <code>--color</code> and <code>--no-color</code>
+command-line flags.</p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight shell"><code>driver:
+  name: terraform
+  color: <span class="nb">false</span>
+</code></pre></div>
+<h3 id="commandtimeout">command_timeout</h3>
+
+<p>This attribute controls the number of seconds that the plugin will wait
+for Terraform commands to finish running.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2803828">Integer</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: <code>600</code></p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">command_timeout</span><span class="pi">:</span> <span class="m">1200</span>
+</code></pre></div>
+<h3 id="lock">lock</h3>
+
+<p>This attribute toggles
+<a href="https://www.terraform.io/docs/state/locking.html">locking</a> of the
+Terraform state file.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2803629">Boolean</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: <code>true</code></p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">lock</span><span class="pi">:</span> <span class="no">false</span>
+</code></pre></div>
+<h3 id="locktimeout">lock_timeout</h3>
+
+<p>This attribute controls the number of seconds that Terraform will wait
+for a lock on the state to be obtained during operations related to state.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2803828">Integer</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: <code>0</code></p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">lock_timeout</span><span class="pi">:</span> <span class="m">10</span>
+</code></pre></div>
+<h3 id="parallelism">parallelism</h3>
+
+<p>This attribute controls the number of concurrent operations to use while
+Terraform
+<a href="https://www.terraform.io/docs/internals/graph.html#walking-the-graph">walks the resource graph</a>.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2803828">Integer</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: +10+</p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">parallelism</span><span class="pi">:</span> <span class="m">50</span>
+</code></pre></div>
+<h3 id="plugindirectory">plugin_directory</h3>
+
+<p>This attribute contains the path to the directory which contains
+<a href="https://www.terraform.io/docs/commands/init.html#plugin-installation">customized Terraform provider plugins</a>
+to install in place of the official Terraform provider plugins.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2760844">Scalar</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: There is no default value because any value will disable the normal 
+Terraform plugin retrieval process.</p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">plugin_directory</span><span class="pi">:</span> <span class="s">/path/to/terraform/plugins</span>
+</code></pre></div>
+<h3 id="rootmoduledirectory">root_module_directory</h3>
+
+<p>This attribute contains the path to the directory which contains the
+root Terraform module to be tested.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2760844">Scalar</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: The
+<a href="https://en.wikipedia.org/wiki/Working_directory">working directory</a> of
+the Kitchen process.</p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">root_module_directory</span><span class="pi">:</span> <span class="s">/path/to/terraform/root/module/directory</span>
+</code></pre></div>
+<h3 id="variablefiles">variable_files</h3>
+
+<p>This attribute comprises paths to
+<a href="https://www.terraform.io/docs/configuration/variables.html#variable-files">Terraform variable files</a>
+which will be sourced by Terraform.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2760118">Sequence of scalars</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">variable_files</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">/path/to/first/variable/file</span>
+    <span class="pi">-</span> <span class="s">/path/to/second/variable/file</span>
+</code></pre></div>
+<h3 id="variables">variables</h3>
+
+<p>This attribute comprises
+<a href="https://www.terraform.io/docs/configuration/variables.html">Terraform variables</a>
+which will be input to Terraform.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2760142">Mapping of scalars to scalars</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">variables</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">image-1234</span>
+    <span class="na">zone</span><span class="pi">:</span> <span class="s">zone-5</span>
+</code></pre></div>
+<h3 id="verifyversion">verify_version</h3>
+
+<p>This attribute toggles strict or permissive verification of support for
+the version of the Terraform client specified by the <code>client</code> attribute.</p>
+
+<p><em>YAML Type</em>: <a href="http://www.yaml.org/spec/1.2/spec.html#id2803629">Boolean</a></p>
+
+<p><em>Required</em>: False</p>
+
+<p><em>Default</em>: <code>true</code></p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">driver</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
+  <span class="na">verify_version</span><span class="pi">:</span> <span class="no">false</span>
+</code></pre></div>
+    </div>
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">Community driven, created and maintained by
+          <a href="http://newcontext.com" style="color: #32c850;">
+            <img src="/kitchen-terraform/images/newcontext_logo.png" class="d-inline-block" style="vertical-align: sub;" width="30" height="24" alt="New Context, Inc. logo" />
+            New Context, Inc.
+          </a>
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>

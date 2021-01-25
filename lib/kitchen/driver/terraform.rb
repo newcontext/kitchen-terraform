@@ -43,95 +43,11 @@ module Kitchen
   #
   # @see http://www.rubydoc.info/gems/test-kitchen/Kitchen/Driver
   module Driver
-
-    # The driver is the bridge between Test Kitchen and Terraform. It manages the
-    # {https://www.terraform.io/docs/state/index.html state} of the Terraform root module by shelling out and running
+    # Terraform manages the {https://www.terraform.io/docs/state/index.html state} of the Terraform root module by shelling out and running
     # Terraform commands.
-    #
-    # === Commands
-    #
-    # The following command-line commands are provided by the driver.
-    #
-    # ==== kitchen create
-    #
-    # {include:Kitchen::Terraform::Driver::Create}
-    #
-    # ==== kitchen destroy
-    #
-    # {include:Kitchen::Terraform::Driver::Destroy}
-    #
-    # === Configuration Attributes
-    #
-    # The configuration attributes of the driver control the behaviour of the Terraform commands that are run. Within the
-    # {http://kitchen.ci/docs/getting-started/kitchen-yml Test Kitchen configuration file}, these attributes must be
-    # declared in the +driver+ mapping along with the plugin name.
-    #
-    #   driver:
-    #     name: terraform
-    #     a_configuration_attribute: some value
-    #
-    # ==== backend_configurations
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::BackendConfigurations}
-    #
-    # ==== client
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::Client}
-    #
-    # ==== color
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::Color}
-    #
-    # ==== command_timeout
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::CommandTimeout}
-    #
-    # ==== lock
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::Lock}
-    #
-    # ==== lock_timeout
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::LockTimeout}
-    #
-    # ==== parallelism
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::Parallelism}
-    #
-    # ==== plugin_directory
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::PluginDirectory}
-    #
-    # ==== root_module_directory
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::RootModuleDirectory}
-    #
-    # ==== variable_files
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::VariableFiles}
-    #
-    # ==== variables
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::Variables}
-    #
-    # ==== verify_version
-    #
-    # {include:Kitchen::Terraform::ConfigAttribute::VerifyVersion}
-    #
-    # === Ruby Interface
     #
     # This class implements the interface of Kitchen::Configurable which requires the following Reek suppressions:
     # :reek:MissingSafeMethod { exclude: [ finalize_config! ] }
-    #
-    # @example Describe the create command
-    #   kitchen help create
-    # @example Create a Test Kitchen instance
-    #   kitchen create default-ubuntu
-    # @example Describe the destroy command
-    #   kitchen help destroy
-    # @example Destroy a Test Kitchen instance
-    #   kitchen destroy default-ubuntu
-    # @version 2
     class Terraform < ::Kitchen::Driver::Base
       kitchen_driver_api_version 2
 

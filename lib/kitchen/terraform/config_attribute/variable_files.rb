@@ -22,16 +22,7 @@ require "kitchen/terraform/file_path_config_attribute_definer"
 module Kitchen
   module Terraform
     class ConfigAttribute
-      # This attribute comprises paths to
-      # {https://www.terraform.io/docs/configuration/variables.html#variable-files Terraform variable files}.
-      #
-      # Type:: {http://www.yaml.org/spec/1.2/spec.html#id2760118 Sequence of scalars}
-      # Required:: False
-      # Example::
-      #   _
-      #     variable_files:
-      #       - /path/to/first/variable/file
-      #       - /path/to/second/variable/file
+      # VariableFiles adds the variable_files configuration attribute.
       module VariableFiles
         class << self
           # A callback to define the configuration attribute which is invoked when this module is included in a plugin

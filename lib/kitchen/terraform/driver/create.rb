@@ -25,17 +25,7 @@ require "kitchen/terraform/verify_version"
 module Kitchen
   module Terraform
     module Driver
-      # A Test Kitchen instance is created through the following steps.
-      #
-      # ===== Initializing the Terraform Working Directory
-      #
-      # {include:Kitchen::Terraform::Command::Init}
-      #
-      # ===== Creating or Selecting the Test Terraform Workspace
-      #
-      # {include:Kitchen::Terraform::Command::WorkspaceNew}
-      #
-      # {include:Kitchen::Terraform::Command::WorkspaceSelect}
+      # Create implements the <code>kitchen create</code> command.
       class Create
         # #call executes the action.
         #

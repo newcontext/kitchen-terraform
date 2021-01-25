@@ -6,7 +6,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="msapplication-config" content="browserconfig.xml" />
-    <title>Community Resources for Kitchen-Terraform</title>
+    <title>Documentation</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/kitchen-terraform/apple-touch-icon-180x180-precomposed.png">
     <link rel="apple-touch-icon" sizes="152x152" href="/kitchen-terraform/apple-touch-icon-152x152-precomposed.png">
     <link rel="apple-touch-icon" sizes="144x144" href="/kitchen-terraform/apple-touch-icon-144x144-precomposed.png">
@@ -59,33 +59,22 @@
       </div>
     </nav>
     <div class="content text-left">
-      <div class="container" style="padding-top: 0px;">
-  <div class="row">
-    <div class="col-12">
-      <div class="jumbotron">
-        <h1 class="display-3">
-          Community
-        </h1>
-        <p class="lead">
-          Contribute, report bugs and submit new features at our <a href="https://github.com/newcontext-oss/kitchen-terraform/blob/master/CONTRIBUTING.md" style="color: #32c850;">Github Page</a>
-        </p>
-        <p class="lead">
-          Check out Kitchen-Terraform on <a href="https://travis-ci.com/newcontext-oss/kitchen-terraform" style="color: #32c850;">Travis CI</a>
-        </p>
-        <p class="lead">
-          Find Kitchen-Terraform on <a href="https://rubygems.org/gems/kitchen-terraform" style="color: #32c850;">rubygems.org</a>
-        </p>
-        <p class="lead">
-          Thank you to everyone that has impacted this project, especially <a href="https://github.com/newcontext-oss/kitchen-terraform/blob/master/kitchen-terraform.gemspec#L12" style="color: #32c850;">our contributors</a>!!
-        </p>
-        <hr>
-        <p class="lead">
-          Anything else? Feel free to email us directly: <a href="mailto:kitchen-terraform@newcontext.com" style="color: #32c850;">kitchen-terraform@newcontext.com</a>
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
+      <h1 id="kitchen-terraform-documentation">Kitchen-Terraform Documentation</h1>
+
+<p>Kitchen-Terraform provides three Kitchen plugins which must be
+configured in a
+<a href="https://docs.chef.io/config_yml_kitchen.html">Kitchen configuration file</a> in
+order to test Terraform modules using the Kitchen executable.</p>
+
+<p>The <a href="/kitchen-terraform/documentation/driver.html">Terraform driver</a> manages the state of the
+Terraform root module.</p>
+
+<p>The <a href="/kitchen-terraform/documentation/provisioner.html">Terraform provisioner</a> uses the Terraform
+driver to apply changes to the Terraform state.</p>
+
+<p>The <a href="./verifier.html">Terraform verifier</a> uses InSpec to verify the
+Terraform state.</p>
+
 
     </div>
     <footer class="footer">

@@ -21,13 +21,7 @@ require "kitchen/terraform/config_schemas/boolean"
 module Kitchen
   module Terraform
     class ConfigAttribute
-      # This attribute toggles strict or permissive verification of support for the version of the Terraform client specified by the
-      # <code>client</code> attribute.
-      #
-      # Type:: {http://www.yaml.org/spec/1.2/spec.html#id2803629 Boolean}
-      # Required:: False
-      # Default:: </code>true</code>
-      # Example:: <code>verify_version: false</code>
+      # VerifyVersion adds the verify_version configuration attribute.
       module VerifyVersion
         ::Kitchen::Terraform::ConfigAttribute.new(
           attribute: :verify_version,

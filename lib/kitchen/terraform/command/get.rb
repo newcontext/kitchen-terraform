@@ -19,8 +19,7 @@ require "shellwords"
 module Kitchen
   module Terraform
     module Command
-      # The dependency modules are updated by running a command like the following example:
-      #   terraform get -update <directory>
+      # Get is the class of objects that represent the +get+ command.
       class Get
         # @return [String] the command with flags.
         def to_s

@@ -22,12 +22,7 @@ require "kitchen/terraform/file_path_config_attribute_definer"
 module Kitchen
   module Terraform
     class ConfigAttribute
-      # This attribute contains the path to the directory which contains the root Terraform module to be tested.
-      #
-      # Type:: {http://www.yaml.org/spec/1.2/spec.html#id2760844 Scalar}
-      # Required:: False
-      # Default:: The {https://en.wikipedia.org/wiki/Working_directory working directory} of the Test Kitchen process.
-      # Example:: <code>root_module_directory: /path/to/terraform/root/module/directory</code>
+      # RootModuleDirectory adds the root_module_directory configuration attribute.
       module RootModuleDirectory
         class << self
           # A callback to define the configuration attribute which is invoked when this module is included in a plugin

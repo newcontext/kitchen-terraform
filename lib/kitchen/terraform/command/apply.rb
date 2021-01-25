@@ -23,18 +23,7 @@ require "shellwords"
 module Kitchen
   module Terraform
     module Command
-      # The state changes are applied by running a command like the following example:
-      #   terraform apply\
-      #     -lock=<lock> \
-      #     -lock-timeout=<lock_timeout>s \
-      #     -input=false \
-      #     -auto-approve=true \
-      #     [-no-color] \
-      #     -parallelism=<parallelism> \
-      #     -refresh=true \
-      #     [-var=<variables.first>...] \
-      #     [-var-file=<variable_files.first>...] \
-      #     <directory>
+      # Apply is the class of objects which represent the +apply+ command.
       class Apply
         # #initialize prepares a new instance of the class.
         #

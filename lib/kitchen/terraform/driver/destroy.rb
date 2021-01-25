@@ -27,29 +27,7 @@ require "kitchen/terraform/verify_version"
 module Kitchen
   module Terraform
     module Driver
-      # A Test Kitchen instance is destroyed through the following steps.
-      #
-      # ===== Initializing the Terraform Working Directory
-      #
-      # {include:Kitchen::Terraform::Command::Init}
-      #
-      # ===== Selecting or Creating the Test Terraform Workspace
-      #
-      # {include:Kitchen::Terraform::Command::WorkspaceSelect}
-      #
-      # {include:Kitchen::Terraform::Command::WorkspaceNew}
-      #
-      # ===== Destroying the Terraform State
-      #
-      # {include:Kitchen::Terraform::Command::Destroy}
-      #
-      # ===== Selecting the Default Terraform Workspace
-      #
-      # {include:Kitchen::Terraform::Command::WorkspaceSelect}
-      #
-      # ===== Deleting the Test Terraform Workspace
-      #
-      # {include:Kitchen::Terraform::Command::WorkspaceDelete}
+      # Destroy implements the <code>kitchen destroy</code> command.
       class Destroy
         # #call executes the action.
         #

@@ -22,15 +22,7 @@ require "kitchen/terraform/file_path_config_attribute_definer"
 module Kitchen
   module Terraform
     class ConfigAttribute
-      # This attribute contains the path to the directory which contains
-      # {https://www.terraform.io/docs/commands/init.html#plugin-installation customized Terraform provider plugins} to
-      # install in place of the official Terraform provider plugins.
-      #
-      # Type:: {http://www.yaml.org/spec/1.2/spec.html#id2760844 Scalar}
-      # Required:: False
-      # Default:: There is no default value because any value will disable the normal Terraform plugin retrieval
-      #           process.
-      # Example:: <code>plugin_directory: /path/to/terraform/plugins</code>
+      # PluginDirectory adds the plugin_directory configuration attribute.
       module PluginDirectory
         class << self
           # A callback to define the configuration attribute which is invoked when this module is included in a plugin
