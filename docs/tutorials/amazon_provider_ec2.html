@@ -362,10 +362,15 @@
           Go ahead and open up your <p class="font-weight-bold" style="color: #32c850; display: inline;">output.tf</p> file.
           <br><br>
 <div class="highlight"><pre class="syntax-highlight shell"><code>vim output.tf
-</code></pre></div>          And add this content:
+</code></pre></div>          And add this content: Terraform 0.10, 0.11
           <br><br>
 <div class="highlight"><pre class="syntax-highlight ruby"><code><span class="n">output</span> <span class="s2">"public_dns"</span> <span class="p">{</span>
   <span class="n">value</span> <span class="o">=</span> <span class="s2">"${aws_instance.example.public_dns}"</span>
+<span class="p">}</span>
+</code></pre></div>          Terraform 0.12
+          <br><br>
+<div class="highlight"><pre class="syntax-highlight ruby"><code><span class="n">output</span> <span class="s2">"public_dns"</span> <span class="p">{</span>
+  <span class="n">value</span> <span class="o">=</span> <span class="n">aws_instance</span><span class="p">.</span><span class="nf">example</span><span class="p">.</span><span class="nf">public_dns</span>
 <span class="p">}</span>
 </code></pre></div>          Ok! Now we're ready to finally create some Test Kitchen instances!
           <br><br>
@@ -394,7 +399,7 @@ public_dns <span class="o">=</span> your_aws_instance_public_ip
 </code></pre></div>          And let's add in a very basic test to make sure we are running on an Ubuntu system.
           <br><br>
 <div class="highlight"><pre class="syntax-highlight shell"><code>control <span class="s1">'operating_system'</span> <span class="k">do
-  </span>describe <span class="nb">command</span><span class="o">(</span><span class="s1">'lsb_release -a'</span><span class="o">)</span> <span class="k">do
+  </span>describe <span class="nb">command</span><span class="o">(</span><span class="s1">'uname -a'</span><span class="o">)</span> <span class="k">do
     </span>its<span class="o">(</span><span class="s1">'stdout'</span><span class="o">)</span> <span class="o">{</span> should match <span class="o">(</span>/Ubuntu/<span class="o">)</span> <span class="o">}</span>
   end
 end
@@ -403,7 +408,7 @@ end
 <div class="highlight"><pre class="syntax-highlight shell"><code>bundle <span class="nb">exec </span>kitchen verify
 </code></pre></div>          And hey, it passed! You should see output that includes:
           <br><br>
-<div class="highlight"><pre class="syntax-highlight shell"><code>Command: <span class="sb">`</span>lsb_release <span class="nt">-a</span><span class="sb">`</span>
+<div class="highlight"><pre class="syntax-highlight shell"><code>Command: <span class="sb">`</span><span class="nb">uname</span> <span class="nt">-a</span><span class="sb">`</span>
   stdout
     is expected to match /Ubuntu/
 
@@ -440,7 +445,7 @@ ami <span class="o">=</span> <span class="s2">"ami-6869aa05"</span>
 <span class="o">&gt;&gt;&gt;&gt;&gt;&gt;</span> Message: 1 actions failed.
 <span class="o">&gt;&gt;&gt;&gt;&gt;&gt;</span>     Verify failed on instance &lt;default-ubuntu&gt;.  Please see
 .kitchen/logs/default-ubuntu.log <span class="k">for </span>more details
-</code></pre></div>          So let's take a look at the <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen/log/default-ubuntu.log</p> Parsing through the output, we see this:
+</code></pre></div>          So let's take a look at the <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen/logs/default-ubuntu.log</p> Parsing through the output, we see this:
           <br><br>
 <div class="highlight"><pre class="syntax-highlight shell"><code>ERROR <span class="nt">--</span> default-ubuntu: Message: Transport error, can<span class="s1">'t connect to
 '</span>ssh<span class="s1">' backend: SSH session could not be established
@@ -452,11 +457,11 @@ ami <span class="o">=</span> <span class="s2">"ami-6869aa05"</span>
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
       <span class="na">controls</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">operating_system</span>
-      <span class="na">hostnames</span><span class="pi">:</span> <span class="s">public_dns</span>
-      <span class="na">username</span><span class="pi">:</span> <span class="s">ubuntu</span>
+      <span class="na">backend</span><span class="pi">:</span> <span class="s">ssh</span>
+      <span class="na">user</span><span class="pi">:</span> <span class="s">ubuntu</span>
       <span class="na">reporter</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">documentation</span>
-</code></pre></div>          Notice that the username we have specified for our test is ubuntu - this is fine for an ubuntu instance, but for an Amazon Linux instance, we need to use the ec2-user username
+</code></pre></div>          Notice that the user we have specified for our test is ubuntu - this is fine for an ubuntu instance, but for an Amazon Linux instance, we need to use the ec2-user user
           <br><br>
           So let's go ahead and change that, the verifier section of your <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen.yml</p> should now look like this:
           <br><br>
@@ -467,10 +472,10 @@ ami <span class="o">=</span> <span class="s2">"ami-6869aa05"</span>
       <span class="na">controls</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">operating_system</span>
       <span class="na">backend</span><span class="pi">:</span> <span class="s">ssh</span>
-      <span class="na">key_files</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">~/.ssh/ncs-laptop.pem</span>
-      <span class="na">hosts_output</span><span class="pi">:</span> <span class="s">public_dns</span>
       <span class="na">user</span><span class="pi">:</span> <span class="s">ec2-user</span>
+      <span class="na">key_files</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">~/path/to/your/private/aws/key.pem</span>
+      <span class="na">hosts_output</span><span class="pi">:</span> <span class="s">public_dns</span>
       <span class="na">reporter</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">documentation</span>
 </code></pre></div>          Now try running the tests again:
@@ -478,16 +483,16 @@ ami <span class="o">=</span> <span class="s2">"ami-6869aa05"</span>
 <div class="highlight"><pre class="syntax-highlight shell"><code>bundle <span class="nb">exec </span>kitchen verify
 </code></pre></div>          And now we see a test failure:
           <br><br>
-<div class="highlight"><pre class="syntax-highlight shell"><code>Command: <span class="sb">`</span>lsb_release <span class="nt">-a</span><span class="sb">`</span>
+<div class="highlight"><pre class="syntax-highlight shell"><code>Command: <span class="sb">`</span><span class="nb">uname</span> <span class="nt">-a</span><span class="sb">`</span>
   stdout
     is expected to match /Ubuntu/ <span class="o">(</span>FAILED - 1<span class="o">)</span>
 
 Failures:
 
-  1<span class="o">)</span> Command: <span class="sb">`</span>lsb_release <span class="nt">-a</span><span class="sb">`</span> stdout is expected to match /Ubuntu/
+  1<span class="o">)</span> Command: <span class="sb">`</span><span class="nb">uname</span> <span class="nt">-a</span><span class="sb">`</span> stdout is expected to match /Ubuntu/
      Failure/Error: DEFAULT_FAILURE_NOTIFIER <span class="o">=</span> lambda <span class="o">{</span> |failure, _opts| raise failure <span class="o">}</span>
 
-       expected <span class="s2">""</span> to match /Ubuntu/
+       expected <span class="s2">"Linux ip-172-31-51-109 4.4.11-23.53.amzn1.x86_64 #1 SMP Wed Jun 1 22:22:50 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux</span><span class="se">\n</span><span class="s2">"</span> to match /Ubuntu/
        Diff:
        @@ <span class="nt">-1</span>,2 +1,2 @@
        -/Ubuntu/
@@ -499,10 +504,10 @@ Finished <span class="k">in </span>0.26506 seconds <span class="o">(</span>files
 
 Failed examples:
 
-rspec  <span class="c"># Command: `lsb_release -a` stdout is expected to match /Ubuntu/</span>
+rspec  <span class="c"># Command: `uname -a` stdout is expected to match /Ubuntu/</span>
 </code></pre></div>          Alright, that means our test is failing when it is supposed to be failing, and passing when it is supposed to pass.
           <br><br>
-          Open up your <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen.yml</p> file and change the username back to ubuntu
+          Open up your <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen.yml</p> file and change the user back to ubuntu
           <br><br>
 <div class="highlight"><pre class="syntax-highlight yaml"><code><span class="na">verifier</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">terraform</span>
@@ -511,10 +516,10 @@ rspec  <span class="c"># Command: `lsb_release -a` stdout is expected to match /
       <span class="na">controls</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">operating_system</span>
       <span class="na">backend</span><span class="pi">:</span> <span class="s">ssh</span>
+      <span class="na">user</span><span class="pi">:</span> <span class="s">ubuntu</span>
       <span class="na">key_files</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">~/.ssh/ncs-laptop.pem</span>
+        <span class="pi">-</span> <span class="s">~/path/to/your/private/aws/key.pem</span>
       <span class="na">hosts_output</span><span class="pi">:</span> <span class="s">public_dns</span>
-      <span class="na">user</span><span class="pi">:</span> <span class="s">ec2-user</span>
       <span class="na">reporter</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">documentation</span>
 </code></pre></div>          And open up your <p class="font-weight-bold" style="color: #32c850; display: inline;">testing.tfvars</p> file and switch back to an Ubuntu AMI

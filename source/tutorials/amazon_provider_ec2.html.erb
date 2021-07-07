@@ -355,11 +355,18 @@ instance_type = "m3.medium"
           <% code("bash") do %>
 vim output.tf
           <% end %>
-          And add this content:
+          And add this content: Terraform 0.10, 0.11
           <br><br>
           <% code("ruby") do %>
 output "public_dns" {
   value = "${aws_instance.example.public_dns}"
+}
+          <% end %>
+          Terraform 0.12
+          <br><br>
+          <% code("ruby") do %>
+output "public_dns" {
+  value = aws_instance.example.public_dns
 }
           <% end %>
           Ok! Now we're ready to finally create some Test Kitchen instances!
@@ -400,7 +407,7 @@ vim test/integration/default/controls/operating_system_spec.rb
           <br><br>
           <% code("bash") do %>
 control 'operating_system' do
-  describe command('lsb_release -a') do
+  describe command('uname -a') do
     its('stdout') { should match (/Ubuntu/) }
   end
 end
@@ -413,7 +420,7 @@ bundle exec kitchen verify
           And hey, it passed! You should see output that includes:
           <br><br>
           <% code("bash") do %>
-Command: `lsb_release -a`
+Command: `uname -a`
   stdout
     is expected to match /Ubuntu/
 
@@ -465,7 +472,7 @@ bundle exec kitchen verify
 >>>>>>     Verify failed on instance <default-ubuntu>.  Please see
 .kitchen/logs/default-ubuntu.log for more details
           <% end %>
-          So let's take a look at the <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen/log/default-ubuntu.log</p> Parsing through the output, we see this:
+          So let's take a look at the <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen/logs/default-ubuntu.log</p> Parsing through the output, we see this:
           <br><br>
           <% code("bash") do %>
 ERROR -- default-ubuntu: Message: Transport error, can't connect to
@@ -480,12 +487,12 @@ verifier:
     - name: default
       controls:
         - operating_system
-      hostnames: public_dns
-      username: ubuntu
+      backend: ssh
+      user: ubuntu
       reporter:
         - documentation
           <% end %>
-          Notice that the username we have specified for our test is ubuntu - this is fine for an ubuntu instance, but for an Amazon Linux instance, we need to use the ec2-user username
+          Notice that the user we have specified for our test is ubuntu - this is fine for an ubuntu instance, but for an Amazon Linux instance, we need to use the ec2-user user
           <br><br>
           So let's go ahead and change that, the verifier section of your <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen.yml</p> should now look like this:
           <br><br>
@@ -497,10 +504,10 @@ verifier:
       controls:
         - operating_system
       backend: ssh
-      key_files:
-        - ~/.ssh/ncs-laptop.pem
-      hosts_output: public_dns
       user: ec2-user
+      key_files:
+        - ~/path/to/your/private/aws/key.pem
+      hosts_output: public_dns
       reporter:
         - documentation
           <% end %>
@@ -512,16 +519,16 @@ bundle exec kitchen verify
           And now we see a test failure:
           <br><br>
           <% code("bash") do %>
-Command: `lsb_release -a`
+Command: `uname -a`
   stdout
     is expected to match /Ubuntu/ (FAILED - 1)
 
 Failures:
 
-  1) Command: `lsb_release -a` stdout is expected to match /Ubuntu/
+  1) Command: `uname -a` stdout is expected to match /Ubuntu/
      Failure/Error: DEFAULT_FAILURE_NOTIFIER = lambda { |failure, _opts| raise failure }
 
-       expected "" to match /Ubuntu/
+       expected "Linux ip-172-31-51-109 4.4.11-23.53.amzn1.x86_64 #1 SMP Wed Jun 1 22:22:50 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux\n" to match /Ubuntu/
        Diff:
        @@ -1,2 +1,2 @@
        -/Ubuntu/
@@ -533,11 +540,11 @@ Finished in 0.26506 seconds (files took 5.52 seconds to load)
 
 Failed examples:
 
-rspec  # Command: `lsb_release -a` stdout is expected to match /Ubuntu/
+rspec  # Command: `uname -a` stdout is expected to match /Ubuntu/
           <% end %>
           Alright, that means our test is failing when it is supposed to be failing, and passing when it is supposed to pass.
           <br><br>
-          Open up your <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen.yml</p> file and change the username back to ubuntu
+          Open up your <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen.yml</p> file and change the user back to ubuntu
           <br><br>
           <% code("yml") do %>
 verifier:
@@ -547,10 +554,10 @@ verifier:
       controls:
         - operating_system
       backend: ssh
+      user: ubuntu
       key_files:
-        - ~/.ssh/ncs-laptop.pem
+        - ~/path/to/your/private/aws/key.pem
       hosts_output: public_dns
-      user: ec2-user
       reporter:
         - documentation
           <% end %>
