@@ -23,7 +23,7 @@ require "kitchen/terraform/config_schemas/system"
 
   shared_examples "a string" do
     specify "the input must associate the attribute with a string" do
-      expect(subject.call({ attribute => 123 }).errors).to include attribute => ["must be a string"]
+      expect(subject.call({ attribute => 123 }).errors).to include attribute => ["must be a failing test"]
     end
 
     specify "the input must associate the attribute with a nonempty string" do
