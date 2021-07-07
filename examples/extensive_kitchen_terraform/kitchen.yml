@@ -18,9 +18,9 @@ platforms:
 
     driver:
       variables:
-        instances_ami: ami-ae7bfdb8
+        instances_ami: ami-0ebdd976
 
-        subnet_availability_zone: us-east-1a
+        subnet_availability_zone: us-west-2b
 
     verifier:
       systems:
@@ -70,6 +70,7 @@ platforms:
         subnet_availability_zone: us-west-2b
 
     verifier:
+      name: terraform
       systems:
         - name: local
 

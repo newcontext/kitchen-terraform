@@ -3,7 +3,7 @@ variable "instances_ami" {
 The Amazon Machine Image (AMI) to use for the AWS EC2 instances of the module
 EOD
 
-  type = "string"
+  type = string
 }
 
 variable "subnet_availability_zone" {
@@ -11,5 +11,5 @@ variable "subnet_availability_zone" {
 The isolated, regional location in which to place the subnet of the module
 EOD
 
-  type = "string"
+  type = string
 }
