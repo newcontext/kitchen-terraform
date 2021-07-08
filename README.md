@@ -144,6 +144,13 @@ More information can be found in the
 
 ### Caveats
 
+The verifier does not currently utilize the standard `log_level` configuration setting.
+To get debug output from the verifier use the environment variable:
+
+```bash
+KITCHEN_LOG=debug bundle exec kitchen verify
+```
+
 Versions of Terraform in the 0.11 series may cause `kitchen test` to
 fail if the initial destroy targets an empty Terraform state. A
 workaround for this problem is to use

@@ -62,7 +62,7 @@ end
 gem install bundler
 bundle install
           <% end %>
-          Create this file <p class="font-weight-bold" style="color: #32c850; display: inline;">.kitchen.yml</p> which brings together the Terraform module code and Inspec controls.
+          Create this file <p class="font-weight-bold" style="color: #32c850; display: inline;">kitchen.yml</p> which brings together the Terraform module code and Inspec controls.
           <br><br>
           <div class="row">
             <div class="col">
@@ -80,13 +80,15 @@ transport:
 
 verifier:
   name: terraform
-  groups:
+  systems:
     - name: container
+      backend: ssh
+      hosts_output: container_host
       controls:
         - operating_system
       port: 2222
-      hostnames: hostnames
-    - name: localhost
+    - name: terraform_state
+      backend: local
       controls:
         - state_files
 
@@ -111,7 +113,7 @@ suites:
               <br><br>
               The container group includes a control for the operating system of the Docker container.
               <br><br>
-              Iterating over the elements of the Terraform hostnames output (see creating outputs step), the verifier will run the control against localhost over SSH on port 2222.
+              For each Docker host (see creating outputs step), the verifier will run the control over SSH on port 2222.
               <br><br><br>
               The platforms provide arbitrary grouping for the test suite matrix.
               <br><br>
@@ -122,25 +124,13 @@ suites:
         <div class="tab-pane fade" id="list-two" role="tabpanel" aria-labelledby="list-two-list">
           Example Terraform code using the Docker provider is below. The resources created by this code is what we'll be testing later on.
           <br><br>
-          Create this file <p class="font-weight-bold" style="color: #32c850; display: inline;">main.tf</p> and add each block of code into it.
+          Create the file <p class="font-weight-bold" style="color: #32c850; display: inline;">main.tf</p> and add each block of code into it.
           <br><br>
-          The configuration is restricted to Terraform versions equal to or greater than 0.10.2 and less than 0.11.0. The local backend is configured to demonstrate support for backends.
-          <br><br>
-          <% code("ruby") do %>
-terraform {
-  required_version = "~> 0.10.2"
-
-  backend "local" {
-    path = "local.tfstate"
-  }
-}
-          <% end %>
           The Docker provider is configured to communicate with a Docker host listening on a Unix socket on localhost.
           <br><br>
           <% code("ruby") do %>
 provider "docker" {
-  host    = "unix://localhost/var/run/docker.sock"
-  version = "~> 0.1"
+  host = "unix://localhost/var/run/docker.sock"
 }
           <% end %>
           A SSH daemon Docker image from the public registry is configured as a data source.
@@ -155,15 +145,15 @@ data "docker_registry_image" "ubuntu" {
           <% code("ruby") do %>
 resource "docker_image" "ubuntu" {
   keep_locally  = true
-  name          = "${data.docker_registry_image.ubuntu.name}"
-  pull_triggers = ["${data.docker_registry_image.ubuntu.sha256_digest}"]
+  name          = data.docker_registry_image.ubuntu.name
+  pull_triggers = [ data.docker_registry_image.ubuntu.sha256_digest ]
 }
           <% end %>
           A Docker container based on the Docker image is configured to be running on the Docker host. The container forwards localhost:2222 to its internal SSH daemon.
           <br><br>
           <% code("ruby") do %>
 resource "docker_container" "ubuntu" {
-  image    = "${docker_image.ubuntu.name}"
+  image    = docker_image.ubuntu.name
   must_run = true
   name     = "ubuntu_container"
 
@@ -173,24 +163,40 @@ resource "docker_container" "ubuntu" {
   }
 }
           <% end %>
+          <br><br>
+          Now create the <p class="font-weight-bold" style="color: #32c850; display: inline;">versions.tf</p> file.
+          <br><br>
+          The configuration show below restricts Terraform to versions equal to or greater than 0.13.0 and less than 0.14.0, and ensures the use of a docker provider new enough to work with 0.13
+          <br><br>
+          <% code("ruby") do %>
+terraform {
+  required_providers {
+    docker = {
+      source = "terraform-providers/docker"
+      version = "~> 2.7"
+    }
+  }
+  required_version = "~> 0.13.0"
+}
+          <% end %>
         </div>
         <div class="tab-pane fade" id="list-three" role="tabpanel" aria-labelledby="list-three-list">
-          To assist in testing, Terraform outputs will provide the path of the backend state file and the localhost hostname. The Kitchen-Terraform verifier can use these artifacts to validate the Terraform code.
+          To assist in testing, Terraform outputs will provide the path of the backend state file and the container host name. The Kitchen-Terraform verifier uses these artifacts to validate the Terraform code operated successfully.
           <br><br>
           Create this file <p class="font-weight-bold" style="color: #32c850; display: inline;">output.tf</p> and add each block of code into it.
           <br><br>
           <% code("ruby") do %>
-output "backend_state" {
+output "terraform_state" {
   description = "The path to the backend state file"
-  value       = "${path.module}/local.tfstate"
+  value       = "${path.module}/terraform.tfstate.d/${terraform.workspace}/terraform.tfstate"
 }
 
-output "hostnames" {
-  description = "The hostnames to test"
-  value       = ["localhost"]
+output "container_host" {
+  description = "Host where the container is running"
+  value       = "localhost"
 }
           <% end %>
-          Refer back to the .kitchen.yml and in the verifier section you will see a reference to the above hostnames output.
+          Refer back to the <p class="font-weight-bold" style="color: #32c850; display: inline;">kitchen.yml</p> and in the verifier section you will see a reference to the container host output.
         </div>
         <div class="tab-pane fade" id="list-four" role="tabpanel" aria-labelledby="list-four-list">
           We've created the Terraform code, now it's time to create the Inspec control tests. Please see the <a href="https://www.inspec.io/docs/reference/profiles/" style="color: #32c850;">Inspec documentation</a> to learn more about profiles and controls.
@@ -201,7 +207,7 @@ output "hostnames" {
 ---
 name: default
           <% end %>
-          Referring back to the .kitchen.yml file and inside the verifier section there is an operating_system control which we need to create.
+          Referring back to the <p class="font-weight-bold" style="color: #32c850; display: inline;">kitchen.yml</p> and inside the verifier section there is an operating_system control which we need to create.
           <br><br>
           Create this file <p class="font-weight-bold" style="color: #32c850; display: inline;">test/integration/example/controls/operating_system.rb</p>
           <% code("ruby") do %>
@@ -215,259 +221,151 @@ control "operating_system" do
   end
 end
           <% end %>
-          Let's create the state_files control, which will validate the local Terraform state file is created and has the proper content.
+          Let's create the state_files control, which will validate the Terraform state file is created and has the proper content.
           <br><br>
           Create this file <p class="font-weight-bold" style="color: #32c850; display: inline;">test/integration/example/controls/state_file.rb</p>
           <% code("ruby") do %>
 # frozen_string_literal: true
 
-backend_state =
-attribute(
-"backend_state",
-{}
-)
-
-configured_state =
-attribute(
-"terraform_state",
-{}
-)
+terraform_state = input("terraform_state", {})
 
 control "state_files" do
-describe "the backend state file" do
-subject do
-file backend_state
-end
-
-it do
-is_expected.to exist
-end
-end
-
-  describe "the configured state file" do
+  describe "the terraform state file" do
     subject do
-      file configured_state
+      file terraform_state
     end
 
     it do
-      is_expected.to_not exist
+      is_expected.to exist
     end
   end
 end
           <% end %>
         </div>
         <div class="tab-pane fade" id="list-five" role="tabpanel" aria-labelledby="list-five-list">
-          Execute Kitchen-Terraform by running these commands
-          <br><br>
-          <% code("ruby") do %>
-# Create resources from the Terraform code in main.tf
-bundle exec kitchen converge
-
-# Run the Inspec controls from the .kitchen.yml verifier section
-bundle exec kitchen verify
-          <% end %>
-          Below is example output of Kitchen-Terraform running.
+          Create resources from the Terraform code in <p class="font-weight-bold" style="color: #32c850; display: inline;">main.tf</p>
           <br><br>
           <% code("bash") do %>
------> Starting Kitchen (v<x.x.x.>)
-       Terraform v<x.x.x.>
-
-$$$$$$ Terraform version <x.x.x.> is supported
------> Testing <example-ubuntu>
+bundle exec kitchen converge
+          <% end %>
+          Below is example output of Kitchen-Terraform convergence.
+          <br><br>
+          <% code("ruby") do %>
+-----> Starting Test Kitchen (v2.6.0)
+$$$$$$ Reading the Terraform client version...
+       Terraform v0.13.0
+       + provider registry.terraform.io/terraform-providers/docker v2.7.2
 -----> Creating <example-ubuntu>...
-       Copying configuration from "docker_provider"...
+$$$$$$ Verifying the Terraform client version is in the supported interval of >= 0.11.4, < 0.14.0...
+$$$$$$ Reading the Terraform client version...
+       Terraform v0.13.0
+       + provider registry.terraform.io/terraform-providers/docker v2.7.2
+$$$$$$ Finished reading the Terraform client version.
+$$$$$$ Finished verifying the Terraform client version.
+$$$$$$ Initializing the Terraform working directory...
 
        Initializing the backend...
 
-       Successfully configured the backend "local"! Terraform will automatically
-       use this backend unless the backend configuration changes.
-
        Initializing provider plugins...
-       - Checking for available provider plugins on https://releases.hashicorp.com...
-       - Downloading plugin for provider "docker" (<x.x.x.>)...
+       - Finding terraform-providers/docker versions matching "~> 2.7"...
+       - Installing terraform-providers/docker v2.7.2...
+       - Installed terraform-providers/docker v2.7.2 (signed by HashiCorp)
 
        Terraform has been successfully initialized!
+$$$$$$ Finished initializing the Terraform working directory.
+$$$$$$ Creating the kitchen-terraform-example-ubuntu Terraform workspace...
+       Created and switched to workspace "kitchen-terraform-example-ubuntu "!
 
-       You may now begin working with Terraform. Try running "terraform plan" to see
-       any changes that are required for your infrastructure. All Terraform commands
-       should now work.
+$$$$$$ Finished creating the kitchen-terraform-example-ubuntu Terraform workspace.
+       Finished creating <example-ubuntu > (0m5.73s).
+-----> Converging <example-ubuntu>...
+$$$$$$ Verifying the Terraform client version is in the supported interval of >= 0.11.4, < 0.14.0...
+$$$$$$ Reading the Terraform client version...
+       Terraform v0.13.0
+       + provider registry.terraform.io/terraform-providers/docker v2.7.2
+$$$$$$ Finished reading the Terraform client version.
+$$$$$$ Finished verifying the Terraform client version.
+$$$$$$ Selecting the kitchen-terraform-example-ubuntu Terraform workspace...
+$$$$$$ Finished selecting the kitchen-terraform-example-ubuntu Terraform workspace.
+$$$$$$ Downloading the modules needed for the Terraform configuration...
+$$$$$$ Finished downloading the modules needed for the Terraform configuration.
+$$$$$$ Validating the Terraform configuration files...
+       Success! The configuration is valid.
 
-       If you ever set or change modules or backend configuration for Terraform,
-       rerun this command to reinitialize your working directory. If you forget, other
-       commands will detect it and remind you to do so if necessary.
+$$$$$$ Finished validating the Terraform configuration files.
+$$$$$$ Building the infrastructure based on the Terraform configuration...
        data.docker_registry_image.ubuntu: Refreshing state...
        docker_image.ubuntu: Creating...
-         keep_locally:             "" => "true"
-         latest:                   "" => "<computed>"
-         name:                     "" => "rastasheep/ubuntu-sshd:latest"
-         pull_triggers.#:          "" => "1"
-         pull_triggers.2359657619: "" => "sha256:552227a92aefad9981f3e284a652cc22b54eda63f7a4ddd4db628b3cd12784f5"
-       docker_image.ubuntu: Creation complete after 1s (ID: sha256:ae51c8f5e14e6fc277fa6fce44bf7178...3a13eb5b4rastasheep/ubuntu-sshd:latest)
+       docker_image.ubuntu: Creation complete after 2s [id=sha256:ae51c8f5e14e6fc277fa6fce44bf7178...3a13eb5b4rastasheep/ubuntu-sshd:latest]
        docker_container.ubuntu: Creating...
-         bridge:                   "" => "<computed>"
-         gateway:                  "" => "<computed>"
-         image:                    "" => "rastasheep/ubuntu-sshd:latest"
-         ip_address:               "" => "<computed>"
-         ip_prefix_length:         "" => "<computed>"
-         log_driver:               "" => "json-file"
-         must_run:                 "" => "true"
-         name:                     "" => "ubuntu_container"
-         ports.#:                  "" => "1"
-         ports.265401579.external: "" => "2222"
-         ports.265401579.internal: "" => "22"
-         ports.265401579.ip:       "" => ""
-         ports.265401579.protocol: "" => "tcp"
-         restart:                  "" => "no"
-       docker_container.ubuntu: Creation complete after 1s (ID: 0801b683b3f63cc1acc895ac900071448c1efb9e0bc4b160564d00c761ba56e9)
+       docker_container.ubuntu: Creation complete after 1s [id=0801b683b3f63cc1acc895ac900071448c1efb9e0bc4b160564d00c761ba56e9]
 
        Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
 
-       The state of your infrastructure has been saved to the path
-       below. This state is required to modify and destroy your
-       infrastructure, so keep it safe. To inspect the complete state
-       use the `terraform show` command.
-
-       State path: local.tfstate
-
        Outputs:
 
-       backend_state = docker_provider/.kitchen/kitchen-terraform/example-ubuntu/local.tfstate
-       hostnames = [
-           localhost
-       ]
-       Finished creating <example-ubuntu> (0m46.74s).
------> Converging <example-ubuntu>...
-       Copying configuration from "docker_provider"...
+       backend_state = ./terraform.tfstate.d/kitchen-terraform-example-ubuntu/terraform.tfstate
+       container_host = "localhost"
+$$$$$$ Finished building the infrastructure based on the Terraform configuration.
+$$$$$$ Reading the output variables from the Terraform state...
+$$$$$$ Finished reading the output variables from the Terraform state.
+$$$$$$ Parsing the Terraform output variables as JSON...
+$$$$$$ Finished parsing the Terraform output variables as JSON.
+$$$$$$ Writing the output variables to the Kitchen instance state...
+$$$$$$ Finished writing the output varibales to the Kitchen instance state.
+$$$$$$ Writing the input variables to the Kitchen instance state...
+$$$$$$ Finished writing the input variables to the Kitchen instance state.
+       Finished converging <example-ubuntu> (0m43.18s).
+-----> Test Kitchen is finished. (0m49.75s)
+          <% end %>
 
-       Initializing the backend...
-
-       Initializing provider plugins...
-       - Checking for available provider plugins on https://releases.hashicorp.com...
-       - Downloading plugin for provider "docker" (<x.x.x.>)...
-
-       Terraform has been successfully initialized!
-
-       You may now begin working with Terraform. Try running "terraform plan" to see
-       any changes that are required for your infrastructure. All Terraform commands
-       should now work.
-
-       If you ever set or change modules or backend configuration for Terraform,
-       rerun this command to reinitialize your working directory. If you forget, other
-       commands will detect it and remind you to do so if necessary.
-       data.docker_registry_image.ubuntu: Refreshing state...
-       docker_image.ubuntu: Refreshing state... (ID: sha256:ae51c8f5e14e6fc277fa6fce44bf7178...3a13eb5b4rastasheep/ubuntu-sshd:latest)
-       docker_container.ubuntu: Refreshing state... (ID: 0801b683b3f63cc1acc895ac900071448c1efb9e0bc4b160564d00c761ba56e9)
-
-       Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
-
-       Outputs:
-
-       backend_state = docker_provider/.kitchen/kitchen-terraform/example-ubuntu/local.tfstate
-       hostnames = [
-           localhost
-       ]
-       Finished converging <example-ubuntu> (0m44.77s).
+          Run the Inspec controls from the <p class="font-weight-bold" style="color: #32c850; display: inline;">kitchen.yml</p> verifier section by running this command
+          <br><br>
+          <% code("bash") do %>
+bundle exec kitchen verify
+          <% end %>
+          Below is example output from Kitchen-Terraform verify.
+          <br><br>
+          <% code("ruby") do %>
+-----> Starting Test Kitchen (v2.6.0)
 -----> Setting up <example-ubuntu>...
        Finished setting up <example-ubuntu> (0m0.00s).
 -----> Verifying <example-ubuntu>...
-       {
-           "backend_state": {
-              "sensitive": false,
-              "type": "string",
-              "value": "docker_provider/.kitchen/kitchen-terraform/example-ubuntu/local.tfstate"
-           },
-           "hostnames": {
-              "sensitive": false,
-              "type": "list",
-              "value": [
-                  "localhost"
-              ]
-           }
-       }
-       Verifying host 'localhost' of group 'container'
-       {
-           "backend_state": {
-              "sensitive": false,
-              "type": "string",
-              "value": "docker_provider/.kitchen/kitchen-terraform/example-ubuntu/local.tfstate"
-           },
-           "hostnames": {
-              "sensitive": false,
-              "type": "list",
-              "value": [
-                  "localhost"
-              ]
-           }
-       }
-       Loaded default
+$$$$$$ Reading the Terraform input variables from the Kitchen instance state...
+$$$$$$ Finished reading the Terraform input variables from the Kitchen instance state.
+$$$$$$ Reading the Terraform output variables from the Kitchen instance state...
+$$$$$$ Finished reading the Terraform output varibales from the Kitchen instance state.
+$$$$$$ Verifying the systems...
+$$$$$$ Verifying the 'container' system...
 
 Profile: default
 Version: (not specified)
 Target:  local://
+Target:  ssh://root@localhost:2222
 
   ✔  operating_system: the operating system is Ubuntu
      ✔  the operating system is Ubuntu
 
+
 Profile Summary: 1 successful control, 0 control failures, 0 controls skipped
 Test Summary: 1 successful, 0 failures, 0 skipped
-       Verifying host 'localhost' of group 'localhost'
-       {
-           "backend_state": {
-              "sensitive": false,
-              "type": "string",
-              "value": "docker_provider/.kitchen/kitchen-terraform/example-ubuntu/local.tfstate"
-           },
-           "hostnames": {
-              "sensitive": false,
-              "type": "list",
-              "value": [
-                  "localhost"
-              ]
-           }
-       }
-       Loaded default
+$$$$$$ Finished verifying the 'container' system.
+$$$$$$ Verifying the 'terraform_state' system...
 
 Profile: default
 Version: (not specified)
 Target:  local://
 
-  ✔  state_files: the backend state file should exist; the configured state fi...
-     ✔  the backend state file should exist
-     ✔  the configured state file should not exist
+  ✔  state: Confirm the container state
+     ✔  the backend state file is expected to exist
+
 
 Profile Summary: 1 successful control, 0 control failures, 0 controls skipped
-Test Summary: 2 successful, 0 failures, 0 skipped
-       Finished verifying <example-ubuntu> (0m0.53s).
------> Destroying <example-ubuntu>...
-       Copying configuration from "docker_provider"...
-
-       Initializing the backend...
-
-       Initializing provider plugins...
-       - Checking for available provider plugins on https://releases.hashicorp.com...
-       - Downloading plugin for provider "docker" (<x.x.x.>)...
-
-       Terraform has been successfully initialized!
-
-       You may now begin working with Terraform. Try running "terraform plan" to see
-       any changes that are required for your infrastructure. All Terraform commands
-       should now work.
-
-       If you ever set or change modules or backend configuration for Terraform,
-       rerun this command to reinitialize your working directory. If you forget, other
-       commands will detect it and remind you to do so if necessary.
-       data.docker_registry_image.ubuntu: Refreshing state...
-       docker_image.ubuntu: Refreshing state... (ID: sha256:ae51c8f5e14e6fc277fa6fce44bf7178...3a13eb5b4rastasheep/ubuntu-sshd:latest)
-       docker_container.ubuntu: Refreshing state... (ID: 0801b683b3f63cc1acc895ac900071448c1efb9e0bc4b160564d00c761ba56e9)
-       docker_container.ubuntu: Destroying... (ID: 0801b683b3f63cc1acc895ac900071448c1efb9e0bc4b160564d00c761ba56e9)
-       docker_container.ubuntu: Destruction complete after 0s
-       docker_image.ubuntu: Destroying... (ID: sha256:ae51c8f5e14e6fc277fa6fce44bf7178...3a13eb5b4rastasheep/ubuntu-sshd:latest)
-       docker_image.ubuntu: Destruction complete after 0s
-
-       Destroy complete! Resources: 2 destroyed.
-       Finished destroying <example-ubuntu> (0m45.17s).
-       Finished testing <example-ubuntu> (3m3.38s).
------> Kitchen is finished. (3m8.81s)
+Test Summary: 1 successful, 0 failures, 0 skipped
+$$$$$$ Finished verifying the 'terraform_state' system.
+$$$$$$ Finished verifying the systems.
+       Finished verifying <example-ubuntu> (0m0.17s).
+-----> Test Kitchen is finished. (0m1.06s)
           <% end %>
         </div>
       </div>
